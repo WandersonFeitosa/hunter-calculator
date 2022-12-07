@@ -12,7 +12,6 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
   const [crit, setCrit] = useState("2");
   const [threat, setThreat] = useState("20");
 
-  const [specialAttack, setSpecialAttack] = useState("");
   const [destroyPrey, setDestroyPrey] = useState("");
   const [heavyStrike, setHeavyStrike] = useState("");
   const [atrociusWeapon, setAtrociousWepaon] = useState("");
@@ -20,8 +19,9 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
   const [executePrey, setExecutePrey] = useState("");
   const [usedExecutePrey, setUsedExecutePrey] = useState("");
   const [threatExecute, setThreatExecute] = useState("0");
-  const [slaughtTurn, setSlaughtTurn] = useState("0");
-  const [slaughtUsedTurn, setSlaughtUsedTurn] = useState("0");
+  const [threatExecuteDisabled, setThreatExecuteDisabled] = useState(true);
+
+  const [slaughtPrey, setSlaughtPrey] = useState("0");
 
   function handleDiceAmmount(event: ChangeEvent<HTMLInputElement>) {
     setDiceAmmount(event.target.value);
@@ -35,9 +35,7 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
   function handleThreat(event: ChangeEvent<HTMLInputElement>) {
     setThreat(event.target.value);
   }
-  function handleSpecialAttack(event: ChangeEvent<HTMLSelectElement>) {
-    setSpecialAttack(event.target.value);
-  }
+
   function handleDestroyPrey(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
       setDestroyPrey("checked");
@@ -62,17 +60,21 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
       setUsedExecutePrey("");
     }
   }
-  function handlesetExecutePrey(event: ChangeEvent<HTMLSelectElement>) {
-    setExecutePrey(event.target.value);
+  function handlesetExecutePrey(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target.checked) {
+      setExecutePrey("checked");
+      setThreatExecuteDisabled(false);
+    } else {
+      setExecutePrey("");
+      setThreatExecuteDisabled(true);
+      setThreatExecute("0");
+    }
   }
-  function handleThreatExecute(event: ChangeEvent<HTMLInputElement>) {
+  function handleThreatExecute(event: ChangeEvent<HTMLSelectElement>) {
     setThreatExecute(event.target.value);
   }
-  function handleSlaughtTurn(event: ChangeEvent<HTMLInputElement>) {
-    setSlaughtTurn(event.target.value);
-  }
-  function handleSlaughtUsedTurn(event: ChangeEvent<HTMLInputElement>) {
-    setSlaughtUsedTurn(event.target.value);
+  function handleSlaughtPrey(event: ChangeEvent<HTMLSelectElement>) {
+    setSlaughtPrey(event.target.value);
   }
 
   function handleCalculateInfo() {
@@ -86,21 +88,6 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     let totalBonusDamage = 0;
 
     let diceType = weaponDamage;
-
-    //ATAQUE PODEROSO
-    if (specialAttack == "5") {
-      totalBonusDamage = totalBonusDamage + 5;
-      totalPE = totalPE + 2;
-    }
-
-    if (specialAttack == "10") {
-      totalBonusDamage = totalBonusDamage + 10;
-      totalPE = totalPE + 3;
-    }
-    if (specialAttack == "15") {
-      totalBonusDamage = totalBonusDamage + 15;
-      totalPE = totalPE + 4;
-    }
 
     //GOLPE PESADO
     if (heavyStrike == "checked") {
@@ -124,14 +111,15 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
 
     // EXECUTAR PRESA
 
-    if (executePrey == "first") {
-      totalCrit = totalCrit + 1;
-      totalPE = totalPE + 2;
-      totalThreat = totalThreat - 2;
-    }
-    if (executePrey == "following") {
-      totalPE = totalPE + 2;
-      totalThreat = totalThreat - 2;
+    if (executePrey == "checked") {
+      if (usedExecutePrey == "checked") {
+        totalPE = totalPE + 2;
+        totalThreat = totalThreat - 2;
+      } else {
+        totalCrit = totalCrit + 1;
+        totalPE = totalPE + 2;
+        totalThreat = totalThreat - 2;
+      }
     }
 
     if (usedExecutePrey == "checked") {
@@ -139,28 +127,38 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     }
 
     // AMEAÇA ADICIONAL EXECUTAR PRESA
-    if (Number(threatExecute) >= 1) {
-      let additionalThreatPE = Number(threatExecute) + 3;
-      totalThreat = totalThreat - Number(threatExecute);
-      totalPE = totalPE + additionalThreatPE;
+
+    if (Number(threatExecute) == 1) {
+      totalThreat = totalThreat - 1;
+      totalPE = totalPE + 3;
+    }
+    if (Number(threatExecute) == 2) {
+      totalThreat = totalThreat - 2;
+      totalPE = totalPE + 5;
+    }
+    if (Number(threatExecute) == 3) {
+      totalThreat = totalThreat - 2;
+      totalPE = totalPE + 10;
     }
 
-    //MASSACRAR PRESA
-    let actualSlaughtTurn = Number(slaughtTurn);
-    let SlaughtPE = 0;
+    // MASSACRAR PRESA
 
-    if (actualSlaughtTurn == 1) {
-      SlaughtPE = 2;
+    if (Number(slaughtPrey) == 1) {
       totalCrit = totalCrit + 1;
+      totalPE = totalPE + 2;
     }
-    if (actualSlaughtTurn > 1) {
-      SlaughtPE = actualSlaughtTurn * 2 + 2;
-      totalCrit = totalCrit + 1;
+    if (Number(slaughtPrey) == 2) {
+      totalCrit = totalCrit + 2;
+      totalPE = totalPE + 4;
     }
-
-    totalCrit = totalCrit + Number(slaughtUsedTurn);
-    totalPE = totalPE + SlaughtPE;
-
+    if (Number(slaughtPrey) == 3) {
+      totalCrit = totalCrit + 3;
+      totalPE = totalPE + 8;
+    }
+    if (Number(slaughtPrey) == 4) {
+      totalCrit = totalCrit + 4;
+      totalPE = totalPE + 14;
+    }
     const damageInfo = {
       totalDiceAmmount,
       totalPE,
@@ -169,12 +167,12 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
       totalBonusDamage,
       diceType,
     };
+    console.log(totalPE);
     setDamageInfo(damageInfo);
   }
 
   return (
     <div className={styles.sidebarWrapper}>
-    
       <div>
         <aside className={styles.aside}>
           <div className={styles.title}>Caçador</div>
@@ -218,31 +216,6 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
               />
             </div>
             <div className={styles.inputLine}>
-              <div className={styles.labelInput}> Ataque Poderoso: </div>
-
-              <select
-                name="specialAttack"
-                id=""
-                className={styles.longInput}
-                onChange={handleSpecialAttack}
-              >
-                <option value="">Não</option>
-                <option value="5">+5</option>
-                <option value="10">+10</option>
-                <option value="15">+15</option>
-              </select>
-            </div>
-            <div className={styles.inputLine}>
-              <div className={styles.labelInput}> Desturir Presa: </div>
-
-              <input
-                type="Checkbox"
-                name="destroyPrey"
-                onChange={handleDestroyPrey}
-                value={destroyPrey}
-              />
-            </div>
-            <div className={styles.inputLine}>
               <div className={styles.labelInput}> Golpe Pesado: </div>
               <input
                 type="Checkbox"
@@ -266,17 +239,16 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
             </div>
 
             <div className={styles.inputLine}>
-              <div className={styles.labelInput}> Executar Presa: </div>
+              <div className={styles.labelInput}> Desturir Presa: </div>
 
-              <select
-                className={styles.longInput}
-                onChange={handlesetExecutePrey}
-              >
-                <option value="no">Não</option>
-                <option value="first">Primeiro</option>
-                <option value="following">Sequencia</option>
-              </select>
+              <input
+                type="Checkbox"
+                name="destroyPrey"
+                onChange={handleDestroyPrey}
+                value={destroyPrey}
+              />
             </div>
+
             <div className={styles.inputLine}>
               <div className={styles.labelInput}>
                 Já utilizou Executar Presa?
@@ -289,40 +261,53 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
                 value={usedExecutePrey}
               />
             </div>
+
+            <div className={styles.inputLine}>
+              <div className={styles.labelInput}> Executar Presa: </div>
+              <input
+                type="Checkbox"
+                name="heavyStrike"
+                onChange={handlesetExecutePrey}
+                value={executePrey}
+              />
+            </div>
+
             <div className={styles.inputLine}>
               <div className={styles.labelInput}>
                 Reduzir ameaça além de 2 em:
               </div>
-              <input
+
+              <select
                 className={styles.longInput}
                 name="threatExecute"
-                type="number"
                 onChange={handleThreatExecute}
                 value={threatExecute}
-              />
+                disabled={threatExecuteDisabled}
+              >
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
             </div>
+
             <div className={styles.inputLine}>
-              <div className={styles.labelInput}>
-                Rodada utilizando massacrar:
-              </div>
-              <input
+              <div className={styles.labelInput}>Massacrar Presa:</div>
+
+              <select
                 className={styles.longInput}
-                name="slaughtTurn"
-                type="number"
-                onChange={handleSlaughtTurn}
-                value={slaughtTurn}
-              />
+                name="threatExecute"
+                onChange={handleSlaughtPrey}
+                value={slaughtPrey}
+              >
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
             </div>
-            <div className={styles.inputLine}>
-              <div className={styles.labelInput}>Bonus atual Massacrar:</div>
-              <input
-                className={styles.longInput}
-                name="slaughtUsedTurn"
-                type="number"
-                onChange={handleSlaughtUsedTurn}
-                value={slaughtUsedTurn}
-              />
-            </div>
+
             <button type="submit"> Calcular</button>
           </form>
         </aside>
