@@ -96,7 +96,7 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
 
     //DESTRUIR PRESA
     if (destroyPrey == "checked") {
-      totalDiceAmmount = totalDiceAmmount + 1;
+      totalDiceAmmount = totalDiceAmmount + 2;
       totalPE = totalPE + 2;
     }
 
