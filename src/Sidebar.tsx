@@ -149,15 +149,15 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     }
     if (Number(slaughtPrey) == 2) {
       totalCrit = totalCrit + 2;
-      totalPE = totalPE + 4;
+      totalPE = totalPE + 6;
     }
     if (Number(slaughtPrey) == 3) {
       totalCrit = totalCrit + 3;
-      totalPE = totalPE + 8;
+      totalPE = totalPE + 12;
     }
     if (Number(slaughtPrey) == 4) {
       totalCrit = totalCrit + 4;
-      totalPE = totalPE + 14;
+      totalPE = totalPE + 20;
     }
     const damageInfo = {
       totalDiceAmmount,
