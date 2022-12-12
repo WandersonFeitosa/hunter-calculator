@@ -3,9 +3,10 @@
   padding: 0 1rem;
 
   display: grid;
-  grid-template-columns:  768px 1fr;
+  grid-template-columns:  500px 1fr;
   gap: 2rem;
   align-items: flex-start;
+  max-width: 80%;
 }
 main {
   background: var(--gray-700);

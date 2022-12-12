@@ -1,6 +1,6 @@
 .sidebarWrapper {
   display: grid;
-  grid-template-columns: 370px 1fr auto;
+  grid-template-columns: 420px 1fr auto;
   gap: 1rem;
   align-items: flex-start;
 }

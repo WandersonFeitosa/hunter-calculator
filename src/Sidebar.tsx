@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FocusEvent, useState } from "react";
 
 import styles from "./Sidebar.module.css";
 
@@ -7,21 +7,38 @@ interface SidebarProps {
 }
 
 export function Sidebar({ setDamageInfo }: SidebarProps) {
-  const [diceAmmount, setDiceAmmount] = useState("2");
-  const [weaponDamage, setWeaponDamage] = useState("10");
-  const [crit, setCrit] = useState("2");
-  const [threat, setThreat] = useState("20");
+  const [nex, setNex] = useState("");
+  const [diceAmmount, setDiceAmmount] = useState("");
+  const [weaponDamage, setWeaponDamage] = useState("");
+  const [crit, setCrit] = useState("");
+  const [threat, setThreat] = useState("");
 
   const [destroyPrey, setDestroyPrey] = useState("");
+  const [disabledDestroyPrey, setDisabledDestroyPrey] = useState(false);
+  const [checkedDestroyPrey, setCheckedDestroyPrey] = useState(Boolean);
+
   const [heavyStrike, setHeavyStrike] = useState("");
+
   const [atrociusWeapon, setAtrociousWepaon] = useState("");
 
-  const [executePrey, setExecutePrey] = useState("");
-  const [usedExecutePrey, setUsedExecutePrey] = useState("");
   const [threatExecute, setThreatExecute] = useState("0");
-  const [threatExecuteDisabled, setThreatExecuteDisabled] = useState(true);
 
   const [slaughtPrey, setSlaughtPrey] = useState("0");
+
+  function handleNex(event: ChangeEvent<HTMLInputElement>) {
+    setNex(event.target.value);
+  }
+  function disableDestroyPrey() {
+    if (Number(nex) < 25) {
+      setDisabledDestroyPrey(true);
+      setDestroyPrey("");
+      setCheckedDestroyPrey(false);
+    }
+    if (Number(nex) >= 25) {
+      setDisabledDestroyPrey(false);
+      setCheckedDestroyPrey(false);
+    }
+  }
 
   function handleDiceAmmount(event: ChangeEvent<HTMLInputElement>) {
     setDiceAmmount(event.target.value);
@@ -36,11 +53,13 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     setThreat(event.target.value);
   }
 
-  function handleDestroyPrey(event: ChangeEvent<HTMLInputElement>) {
-    if (event.target.checked) {
-      setDestroyPrey("checked");
-    } else {
+  function handleDestroyPrey(event: any) {
+    if (checkedDestroyPrey == true) {
+      setCheckedDestroyPrey(false);
       setDestroyPrey("");
+    } else {
+      setCheckedDestroyPrey(true);
+      setDestroyPrey("checked");
     }
   }
   function handleHeavyStrike(event: ChangeEvent<HTMLInputElement>) {
@@ -53,23 +72,6 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
   function handleAtrociousWepaon(event: ChangeEvent<HTMLSelectElement>) {
     setAtrociousWepaon(event.target.value);
   }
-  function handleUsedExecutePrey(event: ChangeEvent<HTMLInputElement>) {
-    if (event.target.checked) {
-      setUsedExecutePrey("checked");
-    } else {
-      setUsedExecutePrey("");
-    }
-  }
-  function handlesetExecutePrey(event: ChangeEvent<HTMLInputElement>) {
-    if (event.target.checked) {
-      setExecutePrey("checked");
-      setThreatExecuteDisabled(false);
-    } else {
-      setExecutePrey("");
-      setThreatExecuteDisabled(true);
-      setThreatExecute("0");
-    }
-  }
   function handleThreatExecute(event: ChangeEvent<HTMLSelectElement>) {
     setThreatExecute(event.target.value);
   }
@@ -81,93 +83,98 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     event?.preventDefault();
 
     let totalPE = 0;
-
     let totalDiceAmmount = Number(diceAmmount) + 1;
     let totalCrit = Number(crit);
     let totalThreat = Number(threat);
-    let totalBonusDamage = 0;
-
     let diceType = weaponDamage;
+
+    function addPE(value: number) {
+      totalPE = totalPE + value;
+    }
+    function addDice(value: number) {
+      totalDiceAmmount = totalDiceAmmount + value;
+    }
+    function addCrit(value: number) {
+      totalCrit = totalCrit + value;
+    }
+    function addThreat(value: number) {
+      totalThreat = totalThreat - value;
+    }
 
     //GOLPE PESADO
     if (heavyStrike == "checked") {
-      totalDiceAmmount = totalDiceAmmount + 1;
+      addDice(1);
     }
 
     //DESTRUIR PRESA
+
     if (destroyPrey == "checked") {
-      totalDiceAmmount = totalDiceAmmount + 2;
-      totalPE = totalPE + 2;
+      if (Number(nex) > 40 && Number(nex) < 65) {
+        addDice(2);
+      }
+      if (Number(nex) > 65 && Number(nex) < 99) {
+        addDice(3);
+      }
+      if (Number(nex) >= 99) {
+        addDice(4);
+      }
     }
 
     //ARMA ATROZ
     if (atrociusWeapon == "standard") {
-      totalThreat = totalThreat - 1;
+      addThreat(1);
     }
     if (atrociusWeapon == "trueForm") {
-      totalCrit = totalCrit + 2;
-      totalThreat = totalThreat - 2;
+      addCrit(2);
+      addThreat(2);
     }
 
     // EXECUTAR PRESA
 
-    if (executePrey == "checked") {
-      if (usedExecutePrey == "checked") {
-        totalPE = totalPE + 2;
-        totalThreat = totalThreat - 2;
-      } else {
-        totalCrit = totalCrit + 1;
-        totalPE = totalPE + 2;
-        totalThreat = totalThreat - 2;
-      }
-    }
-
-    if (usedExecutePrey == "checked") {
-      totalCrit = totalCrit + 1;
-    }
-
-    // AMEAÇA ADICIONAL EXECUTAR PRESA
-
-    if (Number(threatExecute) == 1) {
-      totalThreat = totalThreat - 1;
-      totalPE = totalPE + 3;
-    }
     if (Number(threatExecute) == 2) {
-      totalThreat = totalThreat - 2;
-      totalPE = totalPE + 5;
+      addThreat(2);
+      addPE(2);
     }
-    if (Number(threatExecute) == 3) {
-      totalThreat = totalThreat - 2;
-      totalPE = totalPE + 10;
+    if (Number(threatExecute) == 4) {
+      addThreat(4);
+      addPE(6);
+    }
+    if (Number(threatExecute) == 6) {
+      addThreat(6);
+      addPE(12);
+    }
+    if (Number(threatExecute) == 8) {
+      addThreat(6);
+      addPE(20);
     }
 
     // MASSACRAR PRESA
 
     if (Number(slaughtPrey) == 1) {
-      totalCrit = totalCrit + 1;
-      totalPE = totalPE + 2;
+      addCrit(1);
+      addPE(2);
     }
     if (Number(slaughtPrey) == 2) {
-      totalCrit = totalCrit + 2;
-      totalPE = totalPE + 6;
+      addCrit(2);
+      addPE(6);
     }
     if (Number(slaughtPrey) == 3) {
-      totalCrit = totalCrit + 3;
-      totalPE = totalPE + 12;
+      addCrit(3);
+      addPE(12);
     }
     if (Number(slaughtPrey) == 4) {
-      totalCrit = totalCrit + 4;
-      totalPE = totalPE + 20;
+      addCrit(4);
+      addPE(20);
     }
+
     const damageInfo = {
       totalDiceAmmount,
       totalPE,
       totalCrit,
       totalThreat,
-      totalBonusDamage,
       diceType,
     };
-    console.log(totalPE);
+
     setDamageInfo(damageInfo);
   }
 
@@ -177,6 +184,18 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
         <aside className={styles.aside}>
           <div className={styles.title}>Caçador</div>
           <form onSubmit={handleCalculateInfo}>
+            <div className={styles.inputLine}>
+              <div className={styles.labelInput}> NEX </div>
+              <input
+                className={styles.longInput}
+                name="nex"
+                type="text"
+                onChange={handleNex}
+                onBlur={disableDestroyPrey}
+                value={nex}
+              />
+            </div>
+
             <div className={styles.inputLine}>
               <div className={styles.labelInput}>Dano base da arma:</div>
               <input
@@ -244,50 +263,27 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
               <input
                 type="Checkbox"
                 name="destroyPrey"
-                onChange={handleDestroyPrey}
+                onClick={handleDestroyPrey}
                 value={destroyPrey}
+                checked={checkedDestroyPrey}
+                disabled={disabledDestroyPrey}
               />
             </div>
 
             <div className={styles.inputLine}>
-              <div className={styles.labelInput}>
-                Já utilizou Executar Presa?
-              </div>
-
-              <input
-                type="Checkbox"
-                name="heavyStrike"
-                onChange={handleUsedExecutePrey}
-                value={usedExecutePrey}
-              />
-            </div>
-
-            <div className={styles.inputLine}>
-              <div className={styles.labelInput}> Executar Presa: </div>
-              <input
-                type="Checkbox"
-                name="heavyStrike"
-                onChange={handlesetExecutePrey}
-                value={executePrey}
-              />
-            </div>
-
-            <div className={styles.inputLine}>
-              <div className={styles.labelInput}>
-                Reduzir ameaça além de 2 em:
-              </div>
+              <div className={styles.labelInput}>Executar Presa</div>
 
               <select
                 className={styles.longInput}
                 name="threatExecute"
                 onChange={handleThreatExecute}
                 value={threatExecute}
-                disabled={threatExecuteDisabled}
               >
                 <option value="0">0</option>
-                <option value="1">1</option>
                 <option value="2">2</option>
-                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+                <option value="8">8</option>
               </select>
             </div>
 
