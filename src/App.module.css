@@ -3,7 +3,7 @@
   padding: 0 1rem;
 
   display: grid;
-  grid-template-columns:  500px 1fr;
+  grid-template-columns:  21rem 1fr;
   gap: 2rem;
   align-items: flex-start;
   max-width: 80%;
@@ -20,6 +20,7 @@ main {
     font-size: 87.5%;
   }
   .wrapper {
-    grid-template-columns: 1fr;
+    grid-template-columns: 22rem;
+    padding: 0;
   }
 }

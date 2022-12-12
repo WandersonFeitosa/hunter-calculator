@@ -7,15 +7,15 @@ interface SidebarProps {
 }
 
 export function Sidebar({ setDamageInfo }: SidebarProps) {
-  const [nex, setNex] = useState("");
-  const [diceAmmount, setDiceAmmount] = useState("");
-  const [weaponDamage, setWeaponDamage] = useState("");
-  const [crit, setCrit] = useState("");
-  const [threat, setThreat] = useState("");
+  const [nex, setNex] = useState("60");
+  const [diceAmmount, setDiceAmmount] = useState("1");
+  const [weaponDamage, setWeaponDamage] = useState("16");
+  const [crit, setCrit] = useState("3");
+  const [threat, setThreat] = useState("20");
 
   const [destroyPrey, setDestroyPrey] = useState("");
   const [disabledDestroyPrey, setDisabledDestroyPrey] = useState(false);
-  const [checkedDestroyPrey, setCheckedDestroyPrey] = useState(Boolean);
+  const [checkedDestroyPrey, setCheckedDestroyPrey] = useState(false);
 
   const [heavyStrike, setHeavyStrike] = useState("");
 
@@ -29,14 +29,12 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     setNex(event.target.value);
   }
   function disableDestroyPrey() {
+    setDestroyPrey("");
+    setCheckedDestroyPrey(false);
     if (Number(nex) < 25) {
       setDisabledDestroyPrey(true);
-      setDestroyPrey("");
-      setCheckedDestroyPrey(false);
-    }
-    if (Number(nex) >= 25) {
+    } else {
       setDisabledDestroyPrey(false);
-      setCheckedDestroyPrey(false);
     }
   }
 
@@ -53,7 +51,7 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     setThreat(event.target.value);
   }
 
-  function handleDestroyPrey(event: any) {
+  function handleDestroyPrey() {
     if (checkedDestroyPrey == true) {
       setCheckedDestroyPrey(false);
       setDestroyPrey("");
@@ -109,10 +107,15 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     //DESTRUIR PRESA
 
     if (destroyPrey == "checked") {
-      if (Number(nex) > 40 && Number(nex) < 65) {
-        addDice(2);
+      if (Number(nex) >= 25 && Number(nex) < 40) {
+        addDice(1);
+        console.log("aqui");
       }
-      if (Number(nex) > 65 && Number(nex) < 99) {
+      if (Number(nex) >= 40 && Number(nex) < 65) {
+        addDice(2);
+        console.log("aqui");
+      }
+      if (Number(nex) >= 65 && Number(nex) < 99) {
         addDice(3);
       }
       if (Number(nex) >= 99) {
@@ -144,7 +147,7 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
       addPE(12);
     }
     if (Number(threatExecute) == 8) {
-      addThreat(6);
+      addThreat(8);
       addPE(20);
     }
 
@@ -182,7 +185,7 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     <div className={styles.sidebarWrapper}>
       <div>
         <aside className={styles.aside}>
-          <div className={styles.title}>Caçador</div>
+          <div className={styles.title}>Calculadora</div>
           <form onSubmit={handleCalculateInfo}>
             <div className={styles.inputLine}>
               <div className={styles.labelInput}> NEX </div>
@@ -271,7 +274,7 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
             </div>
 
             <div className={styles.inputLine}>
-              <div className={styles.labelInput}>Executar Presa</div>
+              <div className={styles.labelInput}>Executar Presa:</div>
 
               <select
                 className={styles.longInput}
