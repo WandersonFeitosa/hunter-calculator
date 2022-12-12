@@ -45,7 +45,7 @@ export function MainContent({ damageInfo }: MainContentProps) {
             Presa
           </p>
           <p>
-            <b>Executar Presa:</b> Diminui a margem de ameça do ataque
+            <b>Executar Presa:</b> Diminui a margem de ameaça do ataque
           </p>
           <p>
             <b>Masscrar Presa:</b> Aumenta o multiplicador de crítico do ataque
