@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, useState } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
 import styles from "./Sidebar.module.css";
 
@@ -7,167 +7,173 @@ interface SidebarProps {
 }
 
 export function Sidebar({ setDamageInfo }: SidebarProps) {
-  const [nex, setNex] = useState("60");
-  const [diceAmmount, setDiceAmmount] = useState("1");
-  const [weaponDamage, setWeaponDamage] = useState("16");
-  const [crit, setCrit] = useState("3");
-  const [threat, setThreat] = useState("20");
-
-  const [destroyPrey, setDestroyPrey] = useState("");
+  const [data, setData] = useState({
+    nex: "60",
+    diceAmmount: "1",
+    weaponDamage: "16",
+    crit: "3",
+    threat: "20",
+    destroyPrey: "",
+    heavyStrike: "",
+    atrociusWeapon: "",
+    threatExecute: "",
+    slaughtPrey: "",
+  });
   const [disabledDestroyPrey, setDisabledDestroyPrey] = useState(false);
-  const [checkedDestroyPrey, setCheckedDestroyPrey] = useState(false);
+  const [checkedDestroyPrey, setCheckedDestroyPrey] = useState<boolean>();
 
-  const [heavyStrike, setHeavyStrike] = useState("");
+  // Limpa os valores do Destruir Presa caso o NEX do personagem seja menor que 25%
 
-  const [atrociusWeapon, setAtrociousWepaon] = useState("");
-
-  const [threatExecute, setThreatExecute] = useState("0");
-
-  const [slaughtPrey, setSlaughtPrey] = useState("0");
-
-  function handleNex(event: ChangeEvent<HTMLInputElement>) {
-    setNex(event.target.value);
+  function clearDestroyPrey() {
+    const newData = { ...data, destroyPrey: "" };
+    setData(newData);
+    if (disabledDestroyPrey == true) {
+      setCheckedDestroyPrey(false);
+    } else {
+      setCheckedDestroyPrey(undefined);
+    }
   }
-  function disableDestroyPrey() {
-    setDestroyPrey("");
-    setCheckedDestroyPrey(false);
-    if (Number(nex) < 25) {
+
+  useEffect(() => {
+    if (Number(data.nex) < 25) {
       setDisabledDestroyPrey(true);
+      clearDestroyPrey();
     } else {
       setDisabledDestroyPrey(false);
     }
+  }, [data.nex]);
+
+  //---------------------------------------------------------------
+  //Eventos de mudança do formulário
+
+  function handleNotCheckboxChange(
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
+    const inputName = event.target.name;
+    const inputValue = event.target.value;
+    const newData = { ...data, [inputName]: inputValue };
+    setData(newData);
   }
 
-  function handleDiceAmmount(event: ChangeEvent<HTMLInputElement>) {
-    setDiceAmmount(event.target.value);
-  }
-  function handleWeaponDamaget(event: ChangeEvent<HTMLInputElement>) {
-    setWeaponDamage(event.target.value);
-  }
-  function handleCrit(event: ChangeEvent<HTMLInputElement>) {
-    setCrit(event.target.value);
-  }
-  function handleThreat(event: ChangeEvent<HTMLInputElement>) {
-    setThreat(event.target.value);
-  }
+  function handleCheckboxChange(event: ChangeEvent<HTMLInputElement>) {
+    const inputName = event.target.name;
+    const inputValue = event.target.value;
 
-  function handleDestroyPrey() {
-    if (checkedDestroyPrey == true) {
-      setCheckedDestroyPrey(false);
-      setDestroyPrey("");
+    if (inputValue == "checked") {
+      const newData = { ...data, [inputName]: "" };
+      setData(newData);
     } else {
-      setCheckedDestroyPrey(true);
-      setDestroyPrey("checked");
+      const newData = { ...data, [inputName]: "checked" };
+      setData(newData);
     }
   }
-  function handleHeavyStrike(event: ChangeEvent<HTMLInputElement>) {
-    if (event.target.checked) {
-      setHeavyStrike("checked");
-    } else {
-      setHeavyStrike("");
-    }
-  }
-  function handleAtrociousWepaon(event: ChangeEvent<HTMLSelectElement>) {
-    setAtrociousWepaon(event.target.value);
-  }
-  function handleThreatExecute(event: ChangeEvent<HTMLSelectElement>) {
-    setThreatExecute(event.target.value);
-  }
-  function handleSlaughtPrey(event: ChangeEvent<HTMLSelectElement>) {
-    setSlaughtPrey(event.target.value);
-  }
-
-  function handleCalculateInfo() {
-    event?.preventDefault();
+  //---------------------------------------------------------------
+  // Realiza o cálculo dos dados que devem ser jogados
+  function handleCalculateInfo(event: any) {
+    event.preventDefault();
 
     let totalPE = 0;
-    let totalDiceAmmount = Number(diceAmmount) + 1;
-    let totalCrit = Number(crit);
-    let totalThreat = Number(threat);
-    let diceType = weaponDamage;
+    let totalDiceAmmount = Number(data.diceAmmount) + 1;
+    let totalCrit = Number(data.crit);
+    let totalThreat = Number(data.threat);
+    let diceType = data.weaponDamage;
 
+    //Adições que serão feitas de acordo com as opções Marcadas
     function addPE(value: number) {
-      totalPE = totalPE + value;
+      totalPE += value;
     }
     function addDice(value: number) {
-      totalDiceAmmount = totalDiceAmmount + value;
+      totalDiceAmmount += value;
     }
     function addCrit(value: number) {
-      totalCrit = totalCrit + value;
+      totalCrit += value;
     }
     function addThreat(value: number) {
-      totalThreat = totalThreat - value;
+      totalThreat -= value;
     }
 
-    //GOLPE PESADO
-    if (heavyStrike == "checked") {
-      addDice(1);
+    //---------------------------------------------------------------
+    //Contadores manuais que eu tenho que descobrir como automatizar depois
+    function countThreatPerPE() {
+      const threatExecute = Number(data.threatExecute);
+      if (threatExecute == 2) {
+        addThreat(2);
+        addPE(2);
+      }
+      if (threatExecute == 4) {
+        addThreat(4);
+        addPE(6);
+      }
+      if (threatExecute == 6) {
+        addThreat(6);
+        addPE(12);
+      }
+      if (threatExecute == 8) {
+        addThreat(8);
+        addPE(20);
+      }
     }
 
-    //DESTRUIR PRESA
-
-    if (destroyPrey == "checked") {
-      if (Number(nex) >= 25 && Number(nex) < 40) {
+    function countDicePerNEX() {
+      const nex = Number(data.nex);
+      if (nex >= 25 && nex < 40) {
         addDice(1);
-        console.log("aqui");
       }
-      if (Number(nex) >= 40 && Number(nex) < 65) {
+      if (nex >= 40 && nex < 65) {
         addDice(2);
-        console.log("aqui");
       }
-      if (Number(nex) >= 65 && Number(nex) < 99) {
+      if (nex >= 65 && nex < 99) {
         addDice(3);
       }
-      if (Number(nex) >= 99) {
+      if (nex >= 99) {
         addDice(4);
       }
     }
 
+    function countCritPerPE() {
+      const slaughtPrey = Number(data.slaughtPrey);
+      if (slaughtPrey == 1) {
+        addCrit(1);
+        addPE(2);
+      }
+      if (slaughtPrey == 2) {
+        addCrit(2);
+        addPE(6);
+      }
+      if (slaughtPrey == 3) {
+        addCrit(3);
+        addPE(12);
+      }
+      if (slaughtPrey == 4) {
+        addCrit(4);
+        addPE(20);
+      }
+    }
+    //---------------------------------------------------------------
+
+    // GOLPE PESADO
+    if (data.heavyStrike == "checked") {
+      addDice(1);
+    }
+    //DESTRUIR PRESA
+    if (data.destroyPrey == "checked") {
+      countDicePerNEX();
+    }
     //ARMA ATROZ
-    if (atrociusWeapon == "standard") {
+    if (data.atrociusWeapon == "standard") {
       addThreat(1);
     }
-    if (atrociusWeapon == "trueForm") {
+    if (data.atrociusWeapon == "trueForm") {
       addCrit(2);
       addThreat(2);
     }
-
     // EXECUTAR PRESA
-
-    if (Number(threatExecute) == 2) {
-      addThreat(2);
-      addPE(2);
+    if (data.threatExecute) {
+      countThreatPerPE();
     }
-    if (Number(threatExecute) == 4) {
-      addThreat(4);
-      addPE(6);
-    }
-    if (Number(threatExecute) == 6) {
-      addThreat(6);
-      addPE(12);
-    }
-    if (Number(threatExecute) == 8) {
-      addThreat(8);
-      addPE(20);
-    }
-
     // MASSACRAR PRESA
-
-    if (Number(slaughtPrey) == 1) {
-      addCrit(1);
-      addPE(2);
-    }
-    if (Number(slaughtPrey) == 2) {
-      addCrit(2);
-      addPE(6);
-    }
-    if (Number(slaughtPrey) == 3) {
-      addCrit(3);
-      addPE(12);
-    }
-    if (Number(slaughtPrey) == 4) {
-      addCrit(4);
-      addPE(20);
+    if (data.slaughtPrey) {
+      countCritPerPE();
     }
 
     const damageInfo = {
@@ -193,9 +199,8 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
                 className={styles.longInput}
                 name="nex"
                 type="text"
-                onChange={handleNex}
-                onBlur={disableDestroyPrey}
-                value={nex}
+                onChange={handleNotCheckboxChange}
+                value={data.nex}
               />
             </div>
 
@@ -205,16 +210,16 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
                 className={styles.diceInput}
                 name="diceAmmount"
                 type="number"
-                onChange={handleDiceAmmount}
-                value={diceAmmount}
+                onChange={handleNotCheckboxChange}
+                value={data.diceAmmount}
               />
               D
               <input
                 className={styles.diceInput}
                 name="weaponDamage"
                 type="text"
-                onChange={handleWeaponDamaget}
-                value={weaponDamage}
+                onChange={handleNotCheckboxChange}
+                value={data.weaponDamage}
               />
             </div>
             <div className={styles.inputLine}>
@@ -223,8 +228,8 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
                 className={styles.longInput}
                 name="crit"
                 type="text"
-                onChange={handleCrit}
-                value={crit}
+                onChange={handleNotCheckboxChange}
+                value={data.crit}
               />
             </div>
             <div className={styles.inputLine}>
@@ -233,8 +238,8 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
                 className={styles.longInput}
                 name="threat"
                 type="text"
-                onChange={handleThreat}
-                value={threat}
+                onChange={handleNotCheckboxChange}
+                value={data.threat}
               />
             </div>
             <div className={styles.inputLine}>
@@ -242,8 +247,8 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
               <input
                 type="Checkbox"
                 name="heavyStrike"
-                onChange={handleHeavyStrike}
-                value={heavyStrike}
+                onChange={handleCheckboxChange}
+                value={data.heavyStrike}
               />
             </div>
             <div className={styles.inputLine}>
@@ -251,8 +256,8 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
               <select
                 className={styles.longInput}
                 name="atrociusWeapon"
-                onChange={handleAtrociousWepaon}
-                value={atrociusWeapon}
+                onChange={handleNotCheckboxChange}
+                value={data.atrociusWeapon}
               >
                 <option value="no">Não </option>
                 <option value="standard">Padrão</option>
@@ -266,10 +271,10 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
               <input
                 type="Checkbox"
                 name="destroyPrey"
-                onClick={handleDestroyPrey}
-                value={destroyPrey}
-                checked={checkedDestroyPrey}
                 disabled={disabledDestroyPrey}
+                checked={checkedDestroyPrey}
+                onChange={handleCheckboxChange}
+                value={data.destroyPrey}
               />
             </div>
 
@@ -279,8 +284,8 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
               <select
                 className={styles.longInput}
                 name="threatExecute"
-                onChange={handleThreatExecute}
-                value={threatExecute}
+                onChange={handleNotCheckboxChange}
+                value={data.threatExecute}
               >
                 <option value="0">0</option>
                 <option value="2">2</option>
@@ -295,9 +300,9 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
 
               <select
                 className={styles.longInput}
-                name="threatExecute"
-                onChange={handleSlaughtPrey}
-                value={slaughtPrey}
+                name="slaughtPrey"
+                onChange={handleNotCheckboxChange}
+                value={data.slaughtPrey}
               >
                 <option value="0">0</option>
                 <option value="1">1</option>
