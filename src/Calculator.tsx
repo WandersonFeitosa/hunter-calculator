@@ -1,16 +1,16 @@
-import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
-import styles from "./Sidebar.module.css";
+import styles from "./Calculator.module.css";
 
 interface SidebarProps {
   setDamageInfo: Function;
 }
 
-export function Sidebar({ setDamageInfo }: SidebarProps) {
+export function Calculator({ setDamageInfo }: SidebarProps) {
   const [data, setData] = useState({
     nex: "60",
     diceAmmount: "1",
-    weaponDamage: "16",
+    weaponDamage: "12",
     crit: "3",
     threat: "20",
     destroyPrey: "",
@@ -93,8 +93,25 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     }
 
     //---------------------------------------------------------------
-    //Contadores manuais que eu tenho que descobrir como automatizar depois
-    function countThreatPerPE() {
+    //Contadores
+    function atrociusWeapon() {
+      if (data.atrociusWeapon == "standard") {
+        addThreat(1);
+      }
+      if (
+        data.atrociusWeapon == "trueForm" ||
+        data.atrociusWeapon == "specialComponentStandard"
+      ) {
+        addCrit(2);
+        addThreat(2);
+      }
+      if (data.atrociusWeapon == "specialComponentTrueForm") {
+        addCrit(3);
+        addThreat(3);
+      }
+    }
+
+    function executePrey() {
       const threatExecute = Number(data.threatExecute);
       if (threatExecute == 2) {
         addThreat(2);
@@ -115,22 +132,24 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     }
 
     function countDicePerNEX() {
-      const nex = Number(data.nex);
-      if (nex >= 25 && nex < 40) {
-        addDice(1);
-      }
-      if (nex >= 40 && nex < 65) {
-        addDice(2);
-      }
-      if (nex >= 65 && nex < 99) {
-        addDice(3);
-      }
-      if (nex >= 99) {
-        addDice(4);
+      if (data.destroyPrey == "checked") {
+        const nex = Number(data.nex);
+        if (nex >= 25 && nex < 40) {
+          addDice(1);
+        }
+        if (nex >= 40 && nex < 65) {
+          addDice(2);
+        }
+        if (nex >= 65 && nex < 99) {
+          addDice(3);
+        }
+        if (nex >= 99) {
+          addDice(4);
+        }
       }
     }
 
-    function countCritPerPE() {
+    function slaughtPrey() {
       const slaughtPrey = Number(data.slaughtPrey);
       if (slaughtPrey == 1) {
         addCrit(1);
@@ -155,26 +174,18 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
     if (data.heavyStrike == "checked") {
       addDice(1);
     }
+
     //DESTRUIR PRESA
-    if (data.destroyPrey == "checked") {
-      countDicePerNEX();
-    }
+    countDicePerNEX();
+
     //ARMA ATROZ
-    if (data.atrociusWeapon == "standard") {
-      addThreat(1);
-    }
-    if (data.atrociusWeapon == "trueForm") {
-      addCrit(2);
-      addThreat(2);
-    }
+    atrociusWeapon();
+
     // EXECUTAR PRESA
-    if (data.threatExecute) {
-      countThreatPerPE();
-    }
+    executePrey();
+
     // MASSACRAR PRESA
-    if (data.slaughtPrey) {
-      countCritPerPE();
-    }
+    slaughtPrey();
 
     const damageInfo = {
       totalDiceAmmount,
@@ -262,6 +273,12 @@ export function Sidebar({ setDamageInfo }: SidebarProps) {
                 <option value="no">Não </option>
                 <option value="standard">Padrão</option>
                 <option value="trueForm">Verdadeiro</option>
+                <option value="specialComponentStandard">
+                  Padrão/Discente {"("}Componente Espcial{")"}
+                </option>
+                <option value="specialComponentTrueForm">
+                  Verdadeiro {"("}Componente Espcial{")"}
+                </option>
               </select>
             </div>
 

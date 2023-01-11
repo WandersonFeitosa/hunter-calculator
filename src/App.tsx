@@ -1,7 +1,7 @@
 import "./global.css";
 import styles from "./App.module.css";
 
-import { Sidebar } from "./Sidebar";
+import { Calculator } from "./Calculator";
 import { MainContent } from "./MainContent";
 import { useState } from "react";
 
@@ -17,7 +17,7 @@ function App() {
 
   return (
     <div className={styles.wrapper}>
-      <Sidebar setDamageInfo={setDamageInfo} />
+      <Calculator setDamageInfo={setDamageInfo} />
       <MainContent damageInfo={damageInfo} />
     </div>
   );
