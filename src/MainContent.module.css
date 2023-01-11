@@ -9,7 +9,7 @@
   border: 1px solid var(--red-400);
   border-radius: 8px;
   margin-bottom: 2rem;
-  padding: 2rem 0.5rem;
+  padding: 2rem 1rem;
   position: relative;
 }
 p {
@@ -27,6 +27,18 @@ b {
   right: 2rem;
   margin-left: auto;
   width: 150px;
+}
+.description p{
+  margin-bottom: 2.5rem;
+}
+ul {
+  list-style-type: none;
+  margin-left: 0.5rem;
+  margin-top: 0.5rem;
+}
+ul li {
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
 }
 @media (max-width: 768px) {
   .block {
