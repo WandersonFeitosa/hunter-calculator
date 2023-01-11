@@ -1,15 +1,23 @@
 .sidebarWrapper {
-  display: grid;
-  grid-template-columns: 22rem 1fr auto;
-  gap: 1rem;
-  align-items: flex-start;
+  position: fixed;
+  max-width: 22rem;
+  margin-left: 9rem;
+}
+@media (max-width: 768px) {
+  .sidebarWrapper {
+    position: relative;
+    display: grid;
+    grid-template-columns: 22rem 1fr auto;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-left: 0;
+  }
 }
 .aside {
   background: var(--gray-700);
   border-radius: 8px;
   overflow: hidden;
   padding: 2rem;
-  margin-bottom: 1rem;
   border: 1px solid var(--red-400);
 }
 .title {
@@ -97,5 +105,4 @@ select * {
 
 .labelInput {
   min-width: 9rem;
- 
 }

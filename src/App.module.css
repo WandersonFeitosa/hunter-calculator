@@ -1,13 +1,11 @@
 .wrapper {
-  margin: 2rem auto;
+  margin: 1rem auto;
   padding: 0 1rem;
-
-  display: grid;
-  grid-template-columns:  21rem 1fr;
-  gap: 2rem;
   align-items: flex-start;
-  max-width: 80%;
+  max-width: 48rem;
+  margin-left: 33rem;
 }
+
 main {
   background: var(--gray-700);
   border-radius: 8px;
@@ -19,8 +17,16 @@ main {
   html {
     font-size: 87.5%;
   }
-  .wrapper {
-    grid-template-columns: 22rem;
+  .wrapper{
+    margin-left: 0;
     padding: 0;
+  }
+  .wrapperMob {
+    margin: 2rem auto;    
+    display: grid;    
+    align-items: flex-start;
+    max-width: 80%;
+    grid-template-columns: 22rem;
+    padding: 0;    
   }
 }

@@ -16,9 +16,11 @@ function App() {
   });
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapperMob}>
       <Calculator setDamageInfo={setDamageInfo} />
-      <MainContent damageInfo={damageInfo} />
+      <div className={styles.wrapper}>
+        <MainContent damageInfo={damageInfo} />
+      </div>
     </div>
   );
 }

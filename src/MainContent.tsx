@@ -12,7 +12,7 @@ export function MainContent({ damageInfo }: MainContentProps) {
   return (
     <main>
       <div className={styles.block}>
-        <div className={styles.blockTitle}> Informações</div>
+        <div className={styles.blockTitle}>Resultados</div>
         <div>
           <b> PE:</b> {damageInfo.totalPE}
         </div>{" "}
